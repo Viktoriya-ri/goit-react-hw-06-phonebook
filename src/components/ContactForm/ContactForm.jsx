@@ -16,6 +16,9 @@ import {
 import { BsFillPersonFill } from 'react-icons/bs';
 import { GiSmartphone } from 'react-icons/gi';
 import { getContacts } from 'redux/selectors';
+import { nanoid } from '@reduxjs/toolkit';
+import { useState } from 'react';
+
 
 const ContactSchema = Yup.object({
   name: Yup.string()
@@ -27,28 +30,51 @@ const ContactSchema = Yup.object({
 export const ContactForm = () => {
   const dispatch = useDispatch();
   const contacts = useSelector(getContacts);
+ const [name, setName] = useState('');
+  const [number, setNumber] = useState('');
+
+  const onChange = e => {
+    if (e.target.name === 'name') {
+      setName(e.target.value);
+    }
+    if (e.target.name === 'number') {
+      setNumber(e.target.value);
+    }
+  };
+  const handleSubmit = evt => {
+    evt.preventDefault();
+    dispatch(
+      addContact({ name: name, number: number, id: nanoid() })
+    );
+  }
   return (
     <>
       <Toaster />
-      <Formik
+      <form onSubmit={handleSubmit}>
+        <input type="text" name="name" value={name} onChange={onChange} />
+        <input type="tel" name="number" value={number} onChange={onChange} />
+        <button type='submit'>Clic</button>
+      </form>
+      {/* <Formik
         initialValues={{
           name: '',
           number: '',
         }}
         validationSchema={ContactSchema}
         onSubmit={(values, actions) => {
-          const existingContact = contacts.find(
-            contact => contact.name.toLowerCase() === values.name.toLowerCase()
-          );
-          if (existingContact) {
-            toast.error(
-              `You already have a ${existingContact.name} in your contacts!`
-            );
-            actions.resetForm();
-          } else {
-            dispatch(addContact(values.name, values.number));
-            actions.resetForm();
-          }
+          console.log(values)
+          // const existingContact = contacts.find(
+          //   contact => contact.name.toLowerCase() === values.name.toLowerCase()
+          // );
+          // if (existingContact) {
+          //   toast.error(
+          //     `You already have a ${existingContact.name} in your contacts!`
+          //   );
+          //   actions.resetForm();
+          // } else {
+            dispatch(addContact({name: values.name, number: values.number, id: nanoid()}));
+          //   actions.resetForm();
+          // }
         }}
       >
         <Form>
@@ -94,7 +120,7 @@ export const ContactForm = () => {
 
           <FormButton type="submit">Add contact</FormButton>
         </Form>
-      </Formik>
+      </Formik> */}
     </>
   );
 };
